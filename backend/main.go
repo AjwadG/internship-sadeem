@@ -28,9 +28,9 @@ func main() {
 	}
 	defer db.Close()
 
-	fmt.Println("file:///" + GetRootpath("database/migrations"))
+	fmt.Println("file://" + GetRootpath("database/migrations"))
 	mig, err := migrate.New(
-		"file:///"+GetRootpath("database/migrations"),
+		"file://"+GetRootpath("database/migrations"),
 		os.Getenv("DATABASE_URL"),
 	)
 	if err != nil {
@@ -47,11 +47,13 @@ func main() {
 
 	r := michi.NewRouter()
 	r.Route("/", func(sub *michi.Router) {
+		r.Handle("/uploads/", http.StripPrefix("/uploads/", http.FileServer(http.Dir("./uploads"))))
+
 		sub.HandleFunc("GET users", controllers.IndexUserHandler)
 		sub.HandleFunc("GET users/{id}", controllers.ShowUserHandler)
-		sub.HandleFunc("POST users", controllers.StoreUserHandler)
 		sub.HandleFunc("PUT users/{id}", controllers.UpdateUserHandler)
 		sub.HandleFunc("DELETE users/{id}", controllers.DeleteUserHandler)
+		sub.HandleFunc("POST signup", controllers.SignUpHandler)
 	})
 	fmt.Println("Starting server on port 8000")
 	http.ListenAndServe(":8000", r)
