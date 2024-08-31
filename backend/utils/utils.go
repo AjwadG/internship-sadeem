@@ -7,6 +7,7 @@ import (
 	"net/http"
 	"os"
 	"path/filepath"
+	"strings"
 	"time"
 
 	"golang.org/x/crypto/bcrypt"
@@ -69,7 +70,7 @@ func HashPassword(password string) (string, error) {
 
 func DeleteImageFile(filePath string) error {
 	// Remove the file
-	if err := os.Remove(filePath); err != nil {
+	if err := os.Remove(strings.TrimPrefix(filePath, Domain+"/")); err != nil {
 		return err
 	}
 	return nil

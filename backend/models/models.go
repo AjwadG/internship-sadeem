@@ -16,3 +16,12 @@ type User struct {
 	Created_at time.Time `db:"created_at" json:"created_at"`
 	Updated_at time.Time `db:"updated_at" json:"updated_at"`
 }
+
+type Vendor struct {
+	ID          uuid.UUID `db:"id"          json:"id"`
+	Name        string    `db:"name"        json:"name"`
+	Img         *string   `db:"img"         json:"img"`
+	Description string    `db:"description" json:"description"`
+	Created_at  time.Time `db:"created_at"  json:"created_at"`
+	Updated_at  time.Time `db:"updated_at"  json:"updated_at"`
+}

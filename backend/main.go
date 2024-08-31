@@ -49,11 +49,34 @@ func main() {
 	r.Route("/", func(sub *michi.Router) {
 		r.Handle("/uploads/", http.StripPrefix("/uploads/", http.FileServer(http.Dir("./uploads"))))
 
-		sub.HandleFunc("GET users", controllers.IndexUserHandler)
-		sub.HandleFunc("GET users/{id}", controllers.ShowUserHandler)
-		sub.HandleFunc("PUT users/{id}", controllers.UpdateUserHandler)
-		sub.HandleFunc("DELETE users/{id}", controllers.DeleteUserHandler)
-		sub.HandleFunc("POST signup", controllers.SignUpHandler)
+		// users routes
+		sub.Group(func(users *michi.Router) {
+			users.HandleFunc("GET users", controllers.IndexUserHandler)
+			users.HandleFunc("GET users/{id}", controllers.ShowUserHandler)
+			users.HandleFunc("PUT users/{id}", controllers.UpdateUserHandler)
+			users.HandleFunc("DELETE users/{id}", controllers.DeleteUserHandler)
+			// users.HandleFunc("POST users/grant-role", controllers.GrantRoleHandler)
+			// users.HandleFunc("POST users/revoke-role", controllers.RevokeRoleHandler)
+
+		})
+
+		sub.Group(func(auth *michi.Router) {
+			auth.HandleFunc("POST signup", controllers.SignUpHandler)
+			// auth.HandleFunc("POST login", controllers.LoginHandler)
+		})
+
+		// vendors routes
+		sub.Group(func(vendors *michi.Router) {
+			vendors.HandleFunc("GET vendors", controllers.IndexVendorHandler)
+			vendors.HandleFunc("POST vendors", controllers.CreateVendorHandler)
+			vendors.HandleFunc("GET vendors/{id}", controllers.ShowVendorHandler)
+			vendors.HandleFunc("PUT vendors/{id}", controllers.UpdateVendorHandler)
+			vendors.HandleFunc("DELETE vendors/{id}", controllers.DeleteVendorHandler)
+			// vendors.HandleFunc("POST vendors/assign-admin", controllers.GrantAdminHandler)
+			// vendors.HandleFunc("POST vendors/revoke-admin", controllers.RevokeAdminHandler)
+			// vendors.HandleFunc("GET vendors/{id}/admins", controllers.VendorAdminsIndexHandler)
+		})
+
 	})
 	fmt.Println("Starting server on port 8000")
 	http.ListenAndServe(":8000", r)
