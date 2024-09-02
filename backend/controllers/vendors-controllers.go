@@ -39,7 +39,12 @@ func IndexVendorHandler(w http.ResponseWriter, r *http.Request) {
 		utils.HandleError(w, http.StatusInternalServerError, err.Error())
 		return
 	}
-	utils.SendJSONResponse(w, http.StatusOK, vendors)
+	userID, ok := r.Context().Value(utils.UserIDKey).(string)
+	if !ok {
+		http.Error(w, "UserID not found in token", http.StatusInternalServerError)
+		return
+	}
+	utils.SendJSONResponse(w, http.StatusOK, userID)
 }
 
 func ShowVendorHandler(w http.ResponseWriter, r *http.Request) {
@@ -126,8 +131,6 @@ func UpdateVendorHandler(w http.ResponseWriter, r *http.Request) {
 		utils.HandleError(w, http.StatusInternalServerError, "Error creating vendor"+err.Error())
 		return
 	}
-	fmt.Println("oldImg", *oldImg)
-	fmt.Println("newImg", *newImg)
 
 	if oldImg != nil {
 		if err := utils.DeleteImageFile(*oldImg); err != nil {

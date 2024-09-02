@@ -61,3 +61,37 @@ func SignUpHandler(w http.ResponseWriter, r *http.Request) {
 	utils.SendJSONResponse(w, http.StatusCreated, user)
 
 }
+
+func LoginHandler(w http.ResponseWriter, r *http.Request) {
+	email := r.FormValue("email")
+	password := r.FormValue("password")
+	if email == "" || password == "" {
+		utils.HandleError(w, http.StatusBadRequest, "Email and password are required")
+		return
+	}
+	var user models.User
+	query, args, err := QB.Select("*").
+		From("users").
+		Where("email = ?", email).
+		ToSql()
+	if err != nil {
+		utils.HandleError(w, http.StatusInternalServerError, "Error generate query")
+		return
+	}
+	if err := db.Get(&user, query, args...); err != nil {
+		utils.HandleError(w, http.StatusUnauthorized, "Invalid email or password")
+		return
+	}
+	if !utils.CheckPasswordHash(password, user.Password) {
+		utils.HandleError(w, http.StatusUnauthorized, "Invalid email or password")
+		return
+	}
+
+	token, err := utils.GenerateToken(user.ID)
+	if err != nil {
+		utils.HandleError(w, http.StatusInternalServerError, "Error generating token")
+		return
+	}
+
+	utils.SendJSONResponse(w, http.StatusOK, map[string]string{"token": token})
+}

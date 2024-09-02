@@ -4,6 +4,7 @@ import (
 	"errors"
 	"fmt"
 	"internship-project/controllers"
+	"internship-project/utils"
 	"log"
 	"net/http"
 	"os"
@@ -62,12 +63,12 @@ func main() {
 
 		sub.Group(func(auth *michi.Router) {
 			auth.HandleFunc("POST signup", controllers.SignUpHandler)
-			// auth.HandleFunc("POST login", controllers.LoginHandler)
+			auth.HandleFunc("POST login", controllers.LoginHandler)
 		})
 
 		// vendors routes
 		sub.Group(func(vendors *michi.Router) {
-			vendors.HandleFunc("GET vendors", controllers.IndexVendorHandler)
+			vendors.HandleFunc("GET vendors", utils.ValdiateToken(controllers.IndexVendorHandler))
 			vendors.HandleFunc("POST vendors", controllers.CreateVendorHandler)
 			vendors.HandleFunc("GET vendors/{id}", controllers.ShowVendorHandler)
 			vendors.HandleFunc("PUT vendors/{id}", controllers.UpdateVendorHandler)

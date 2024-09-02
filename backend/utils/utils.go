@@ -1,6 +1,7 @@
 package utils
 
 import (
+	"context"
 	"encoding/json"
 	"fmt"
 	"io"
@@ -10,12 +11,16 @@ import (
 	"strings"
 	"time"
 
+	"github.com/golang-jwt/jwt/v5"
+	"github.com/google/uuid"
 	"golang.org/x/crypto/bcrypt"
 	"golang.org/x/exp/rand"
 )
 
 var (
 	Domain = os.Getenv("DOMAIN")
+
+	jwtSecret = []byte(os.Getenv("JWT_SECRET"))
 )
 
 func SendJSONResponse(w http.ResponseWriter, status int, data interface{}) {
@@ -68,10 +73,69 @@ func HashPassword(password string) (string, error) {
 	return string(hashPassword), nil
 }
 
+func CheckPasswordHash(password string, hash string) bool {
+	err := bcrypt.CompareHashAndPassword([]byte(hash), []byte(password))
+	return err == nil
+}
+
 func DeleteImageFile(filePath string) error {
 	// Remove the file
 	if err := os.Remove(strings.TrimPrefix(filePath, Domain+"/")); err != nil {
 		return err
 	}
 	return nil
+}
+
+func GenerateToken(userId uuid.UUID) (string, error) {
+	token := jwt.NewWithClaims(jwt.SigningMethodHS256, jwt.MapClaims{
+		"exp":    time.Now().Add(time.Hour * 24).Unix(),
+		"iat":    time.Now().Unix(),
+		"userID": userId,
+	})
+
+	tokenString, err := token.SignedString(jwtSecret)
+	if err != nil {
+		return "", err
+	}
+
+	return tokenString, nil
+}
+
+type contextKey string
+
+const UserIDKey = contextKey("userID")
+
+func ValdiateToken(next http.HandlerFunc) http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+		tokenString := r.Header.Get("Authorization")
+		if tokenString == "" {
+			http.Error(w, "Missing Authorization header", http.StatusUnauthorized)
+			return
+		}
+
+		token, err := jwt.Parse(tokenString, func(token *jwt.Token) (interface{}, error) {
+			if _, ok := token.Method.(*jwt.SigningMethodHMAC); !ok {
+				return nil, fmt.Errorf("unexpected signing method: %v", token.Header["alg"])
+			}
+			return jwtSecret, nil
+		})
+
+		if err != nil || !token.Valid {
+			http.Error(w, "Invalid token", http.StatusUnauthorized)
+			return
+		}
+
+		// Extract userID from token claims
+		if claims, ok := token.Claims.(jwt.MapClaims); ok && token.Valid {
+			userID := claims["userID"].(string)
+			// Add userID to the context
+			ctx := context.WithValue(r.Context(), UserIDKey, userID)
+			r = r.WithContext(ctx)
+		} else {
+			http.Error(w, "Invalid token claims", http.StatusUnauthorized)
+			return
+		}
+
+		next(w, r)
+	}
 }
