@@ -56,8 +56,8 @@ func main() {
 			users.HandleFunc("GET users/{id}", controllers.ShowUserHandler)
 			users.HandleFunc("PUT users/{id}", controllers.UpdateUserHandler)
 			users.HandleFunc("DELETE users/{id}", controllers.DeleteUserHandler)
-			// users.HandleFunc("POST users/grant-role", controllers.GrantRoleHandler)
-			// users.HandleFunc("POST users/revoke-role", controllers.RevokeRoleHandler)
+			users.HandleFunc("POST users/grant-role", controllers.GrantRoleHandler)
+			users.HandleFunc("POST users/revoke-role", controllers.RevokeRoleHandler)
 
 		})
 
@@ -69,10 +69,10 @@ func main() {
 		// vendors routes
 		sub.Group(func(vendors *michi.Router) {
 			vendors.HandleFunc("GET vendors", utils.ValdiateToken(controllers.IndexVendorHandler))
-			vendors.HandleFunc("POST vendors", controllers.CreateVendorHandler)
-			vendors.HandleFunc("GET vendors/{id}", controllers.ShowVendorHandler)
-			vendors.HandleFunc("PUT vendors/{id}", controllers.UpdateVendorHandler)
-			vendors.HandleFunc("DELETE vendors/{id}", controllers.DeleteVendorHandler)
+			vendors.HandleFunc("POST vendors", utils.ValdiateToken(controllers.CreateVendorHandler))
+			vendors.HandleFunc("GET vendors/{id}", utils.ValdiateToken(controllers.ShowVendorHandler))
+			vendors.HandleFunc("PUT vendors/{id}", utils.ValdiateToken(controllers.UpdateVendorHandler))
+			vendors.HandleFunc("DELETE vendors/{id}", utils.ValdiateToken(controllers.DeleteVendorHandler))
 			// vendors.HandleFunc("POST vendors/assign-admin", controllers.GrantAdminHandler)
 			// vendors.HandleFunc("POST vendors/revoke-admin", controllers.RevokeAdminHandler)
 			// vendors.HandleFunc("GET vendors/{id}/admins", controllers.VendorAdminsIndexHandler)
