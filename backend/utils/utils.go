@@ -109,7 +109,14 @@ func ValdiateToken(next http.HandlerFunc) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		tokenString := r.Header.Get("Authorization")
 		if tokenString == "" {
-			http.Error(w, "Missing Authorization header", http.StatusUnauthorized)
+			HandleError(w, http.StatusUnauthorized, "Missing Authorization header")
+			return
+		}
+
+		if strings.HasPrefix(tokenString, "Bearer ") {
+			tokenString = strings.TrimPrefix(tokenString, "Bearer ")
+		} else {
+			HandleError(w, http.StatusUnauthorized, "Invalid Authorization header")
 			return
 		}
 
@@ -121,7 +128,7 @@ func ValdiateToken(next http.HandlerFunc) http.HandlerFunc {
 		})
 
 		if err != nil || !token.Valid {
-			http.Error(w, "Invalid token", http.StatusUnauthorized)
+			HandleError(w, http.StatusUnauthorized, "Invalid token")
 			return
 		}
 
@@ -132,7 +139,7 @@ func ValdiateToken(next http.HandlerFunc) http.HandlerFunc {
 			ctx := context.WithValue(r.Context(), UserIDKey, userID)
 			r = r.WithContext(ctx)
 		} else {
-			http.Error(w, "Invalid token claims", http.StatusUnauthorized)
+			HandleError(w, http.StatusUnauthorized, "Invalid token claims")
 			return
 		}
 

@@ -39,12 +39,12 @@ func IndexVendorHandler(w http.ResponseWriter, r *http.Request) {
 		utils.HandleError(w, http.StatusInternalServerError, err.Error())
 		return
 	}
-	userID, ok := r.Context().Value(utils.UserIDKey).(string)
-	if !ok {
-		http.Error(w, "UserID not found in token", http.StatusInternalServerError)
-		return
-	}
-	utils.SendJSONResponse(w, http.StatusOK, userID)
+	// userID, ok := r.Context().Value(utils.UserIDKey).(string)
+	// if !ok {
+	// 	http.Error(w, "UserID not found in token", http.StatusInternalServerError)
+	// 	return
+	// }
+	utils.SendJSONResponse(w, http.StatusOK, vendors)
 }
 
 func ShowVendorHandler(w http.ResponseWriter, r *http.Request) {
