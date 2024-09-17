@@ -1,0 +1,23 @@
+.vendorCard {
+  border: 1px solid #ccc;
+  padding: 15px;
+  border-radius: 8px;
+  background-color: white;
+}
+
+.vendorCard img {
+  max-width: 100%;
+  height: auto;
+  border-radius: 8px;
+}
+
+.vendorCard h3 {
+  font-size: 18px;
+  font-weight: bold;
+  margin: 10px 0;
+}
+
+.vendorCard p {
+  font-size: 14px;
+  color: #666;
+}

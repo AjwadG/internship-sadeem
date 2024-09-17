@@ -47,7 +47,10 @@ func main() {
 	controllers.SetDB(db)
 
 	r := michi.NewRouter()
+
+	r.Use(utils.CORS)
 	r.Route("/", func(sub *michi.Router) {
+
 		r.Handle("/uploads/", http.StripPrefix("/uploads/", http.FileServer(http.Dir("./uploads"))))
 
 		// users routes

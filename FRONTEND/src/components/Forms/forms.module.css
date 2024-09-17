@@ -1,0 +1,30 @@
+.submit_button {
+  width: 100%;
+  padding: 10px;
+  background-color: #8b0000;
+  color: white;
+  font-size: 20px;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+.submit_button:hover {
+  background-color: #b22222;
+}
+
+.input_field .label {
+  font-size: 20px;
+  font-weight: bold;
+  display: block;
+  margin: 10px 0 3px;
+  color: #333;
+}
+
+.input_field .input {
+  width: 100%;
+  padding: 10px;
+  margin: 10px 0;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+}
