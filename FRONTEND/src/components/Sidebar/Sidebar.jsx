@@ -13,15 +13,15 @@ const Sidebar = () => {
     <div className={styles.sidebar}>
       <img src="/images/logo.svg" alt="Cheffest Logo" />
       <ul>
-        <li>
+        {/* <li>
           <FaUser className={styles.icon} />
           <a href="/users">Users</a>
-        </li>
+        </li> */}
         <li>
           <FaStore className={styles.icon} />
-          <a href="/vendors">Vendors</a>
+          <a href="/">Vendors</a>
         </li>
-        <li>
+        {/* <li>
           <FaTable className={styles.icon} />
           <a href="/tables">Tables</a>
         </li>
@@ -32,7 +32,7 @@ const Sidebar = () => {
         <li>
           <FaShoppingCart className={styles.icon} />
           <a href="/orders">Orders</a>
-        </li>
+        </li> */}
       </ul>
     </div>
   );

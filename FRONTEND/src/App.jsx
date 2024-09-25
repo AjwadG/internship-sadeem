@@ -6,11 +6,34 @@ import { store } from "./redux/store.js";
 import Login from "./pages/login/Login.jsx";
 import Home from "./pages/home/Home.jsx";
 import AddVendor from "./pages/Vendors/AddVendor.jsx";
+import EditVendor from "./pages/Vendors/EditVendor.jsx";
+import Guard from "./components/guard/Guard.jsx";
+import ViewVendor from "./pages/Vendors/ViewVendor.jsx";
 
 const router = createBrowserRouter([
   {
     path: "/",
-    element: <Home />,
+    element: (
+      <Guard>
+        <Home />
+      </Guard>
+    ),
+  },
+  {
+    path: "/vendors/edit/:id",
+    element: (
+      <Guard>
+        <EditVendor />{" "}
+      </Guard>
+    ),
+  },
+  {
+    path: "/vendors/view/:id",
+    element: (
+      <Guard>
+        <ViewVendor />{" "}
+      </Guard>
+    ),
   },
   {
     path: "/login",
@@ -18,7 +41,11 @@ const router = createBrowserRouter([
   },
   {
     path: "/vendors/add",
-    element: <AddVendor />,
+    element: (
+      <Guard>
+        <AddVendor />{" "}
+      </Guard>
+    ),
   },
 ]);
 const App = () => {

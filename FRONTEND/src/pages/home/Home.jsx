@@ -7,6 +7,7 @@ import styles from "./Home.module.css"; // Importing your CSS module
 import Card from "../../components/Card/Card";
 import Pagination from "../../components/Pagination/Pagination";
 import { useNavigate } from "react-router";
+import { toast } from "react-toastify";
 
 const Home = () => {
   const userToken = useSelector((state) => state.user.userToken);
@@ -45,6 +46,33 @@ const Home = () => {
 
     setVendors(sortedVendors);
   }
+
+  function handleVendorDelete(id) {
+    toast.loading("Deleting vendor...");
+    fetch(`${BASE_URL}/vendors/${id}`, {
+      method: "DELETE",
+      headers: {
+        Authorization: `Bearer ${userToken}`,
+      },
+    })
+      .then((res) => {
+        toast.dismiss();
+        if (res.status === 204) {
+          setVendors(vendors.filter((vendor) => vendor.id !== id));
+          toast.success("Vendor deleted successfully");
+        } else {
+          toast.error("Error while deleting vendor");
+        }
+      })
+      .catch((err) => {
+        toast.dismiss();
+        toast.error("Error while deleting vendor");
+      });
+  }
+
+  function handleVendorEdit(id) {
+    navigate(`/vendors/edit/${id}`);
+  }
   useEffect(() => {
     fetch(`${BASE_URL}/vendors`, {
       method: "GET",
@@ -54,8 +82,10 @@ const Home = () => {
     })
       .then((res) => res.json())
       .then((data) => {
-        setVendors(data);
-        pagination.pages = Math.ceil(data.length / pagination.pageSize);
+        setVendors(data ? data : []);
+        pagination.pages = Math.ceil(
+          data ? data.length : 0 / pagination.pageSize
+        );
         setPagination(pagination);
       });
   }, []);
@@ -85,7 +115,13 @@ const Home = () => {
           (vendor, index) =>
             index >= pagination.pageSize * (pagination.curent - 1) &&
             index < pagination.pageSize * pagination.curent && (
-              <Card key={vendor.id} {...vendor} />
+              <Card
+                key={vendor.id}
+                {...vendor}
+                onEdit={handleVendorEdit}
+                onDelete={handleVendorDelete}
+                onView={() => navigate(`/vendors/view/${vendor.id}`)}
+              />
             )
         )}
       </div>

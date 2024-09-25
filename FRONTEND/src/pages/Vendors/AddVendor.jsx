@@ -1,5 +1,6 @@
 import React from "react";
 import Layout from "../../components/Layout/Layout";
+import { BASE_URL } from "../../consts";
 import { toast } from "react-toastify";
 import InputFieldRHF from "../../components/Forms/InputFieldRHF";
 import SubmitButton from "../../components/Forms/SubmitButton";
@@ -35,7 +36,7 @@ const AddVendor = () => {
 
     toast.loading("Adding vendor...");
 
-    fetch(`/vendors`, {
+    fetch(`${BASE_URL}/vendors`, {
       method: "POST",
       headers: {
         Authorization: `Bearer ${userToken}`,

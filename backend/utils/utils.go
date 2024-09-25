@@ -242,8 +242,6 @@ func QueryBuilder(reciver interface{}, table string, queryParams url.Values, col
 			meta.From = offset + 1
 			if offset+per_page < count {
 				meta.To = offset + per_page
-			} else {
-				meta.To = count
 			}
 		}
 	}
