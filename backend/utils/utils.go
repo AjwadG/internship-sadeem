@@ -4,24 +4,35 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
+	"internship-project/models"
 	"io"
+	"math"
 	"net/http"
+	"net/url"
 	"os"
 	"path/filepath"
+	"strconv"
 	"strings"
 	"time"
 
+	"github.com/Masterminds/squirrel"
 	"github.com/golang-jwt/jwt/v5"
 	"github.com/google/uuid"
+	"github.com/jmoiron/sqlx"
 	"golang.org/x/crypto/bcrypt"
 	"golang.org/x/exp/rand"
 )
 
 var (
 	Domain = os.Getenv("DOMAIN")
+	db     *sqlx.DB
 
 	jwtSecret = []byte(os.Getenv("JWT_SECRET"))
 )
+
+func SetDB(database *sqlx.DB) {
+	db = database
+}
 
 func SendJSONResponse(w http.ResponseWriter, status int, data interface{}) {
 	w.Header().Set("Content-Type", "application/json")
@@ -160,4 +171,91 @@ func CORS(next http.Handler) http.Handler {
 		}
 		next.ServeHTTP(w, r)
 	})
+}
+
+func QueryBuilder(reciver interface{}, table string, queryParams url.Values, columns []string, searchColumns []string) (*models.Meta, error) {
+
+	q := queryParams.Get("q")
+	filters := queryParams.Get("filters")
+	sort := queryParams.Get("sort")
+	page := queryParams.Get("page")
+	per_page := queryParams.Get("per_page")
+
+	query := squirrel.Select().PlaceholderFormat(squirrel.Dollar).From(table)
+
+	if q != "" {
+		ors := squirrel.Or{}
+		for _, column := range searchColumns {
+			ors = append(ors, squirrel.ILike{column: fmt.Sprintf("%%%s%%", q)})
+		}
+		query = query.Where(ors)
+	}
+
+	if filters != "" {
+		for _, filter := range strings.Split(filters, ",") {
+			filter := strings.Split(filter, ":")
+			if len(filter) == 2 {
+				query = query.Where(fmt.Sprintf("%s = ?", filter[0]), filter[1])
+			}
+		}
+	}
+
+	countSQL, counrArgs, err := query.Column("COUNT(*)").ToSql()
+	if err != nil {
+		return nil, err
+	}
+
+	var count int
+
+	if err := db.Get(&count, countSQL, counrArgs...); err != nil {
+		return nil, err
+	}
+
+	if sort != "" {
+		if strings.HasPrefix(sort, "-") {
+			query = query.OrderBy(fmt.Sprintf("%s DESC", strings.TrimPrefix(sort, "-")))
+		} else {
+			query = query.OrderBy(fmt.Sprintf("%s ASC", sort))
+		}
+	}
+
+	query = query.Columns(columns...)
+
+	meta := &models.Meta{
+		Total:        count,
+		Per_page:     count,
+		First_page:   1,
+		Current_page: 1,
+		Last_page:    1,
+		From:         1,
+		To:           count,
+	}
+	if page != "" && per_page != "" {
+		page, _ := strconv.Atoi(page)
+		per_page, _ := strconv.Atoi(per_page)
+		if page > 0 && per_page > 0 {
+			offset := (page - 1) * per_page
+			query = query.Limit(uint64(per_page)).Offset(uint64(offset))
+			meta.Current_page = page
+			meta.Last_page = int(math.Ceil(float64(count) / float64(per_page)))
+			meta.Per_page = per_page
+			meta.From = offset + 1
+			if offset+per_page < count {
+				meta.To = offset + per_page
+			} else {
+				meta.To = count
+			}
+		}
+	}
+
+	sql, args, err := query.ToSql()
+	if err != nil {
+		return nil, err
+	}
+
+	if err := db.Select(reciver, sql, args...); err != nil {
+		return nil, err
+	}
+
+	return meta, nil
 }

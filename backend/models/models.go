@@ -27,6 +27,21 @@ type Vendor struct {
 }
 
 type Role struct {
-	ID int `db:"id" json:"id"`
+	ID   int    `db:"id" json:"id"`
 	Name string `db:"name" json:"name"`
+}
+
+type Response struct {
+	Meta interface{} `json:"meta"`
+	Data interface{} `json:"data"`
+}
+
+type Meta struct {
+	Total int `json:"total"`
+	Per_page int `json:"per_page"`
+	First_page int `json:"first_page"`
+	Current_page int `json:"current_page"`
+	Last_page int `json:"last_page"`
+	From int `json:"from"`
+	To int `json:"to"`
 }

@@ -45,6 +45,7 @@ func main() {
 	}
 
 	controllers.SetDB(db)
+	utils.SetDB(db)
 
 	r := michi.NewRouter()
 
@@ -61,7 +62,12 @@ func main() {
 			users.HandleFunc("DELETE users/{id}", controllers.DeleteUserHandler)
 			users.HandleFunc("POST users/grant-role", controllers.GrantRoleHandler)
 			users.HandleFunc("POST users/revoke-role", controllers.RevokeRoleHandler)
+		})
 
+		// Roles routes
+		sub.Group(func(roles *michi.Router) {
+			roles.HandleFunc("GET roles", controllers.IndexRoleHandler)
+			roles.HandleFunc("GET roles/{id}", controllers.ShowRoleHandler)
 		})
 
 		sub.Group(func(auth *michi.Router) {

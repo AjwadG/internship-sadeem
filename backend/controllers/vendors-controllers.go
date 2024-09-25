@@ -28,23 +28,19 @@ var (
 func IndexVendorHandler(w http.ResponseWriter, r *http.Request) {
 	var vendors []models.Vendor
 
-	query, args, err := QB.Select(strings.Join(vendor_columns, ", ")).
-		From("vendors").
-		ToSql()
+	meta, err := utils.QueryBuilder(&vendors, "vendors", r.URL.Query(), vendor_columns, []string{"name", "description"})
 	if err != nil {
 		utils.HandleError(w, http.StatusInternalServerError, err.Error())
 		return
 	}
-	if err := db.Select(&vendors, query, args...); err != nil {
-		utils.HandleError(w, http.StatusInternalServerError, err.Error())
-		return
+	if vendors == nil {
+		vendors = []models.Vendor{}
 	}
-	// userID, ok := r.Context().Value(utils.UserIDKey).(string)
-	// if !ok {
-	// 	http.Error(w, "UserID not found in token", http.StatusInternalServerError)
-	// 	return
-	// }
-	utils.SendJSONResponse(w, http.StatusOK, vendors)
+
+	utils.SendJSONResponse(w, http.StatusOK, models.Response{
+		Meta: meta,
+		Data: vendors,
+	})
 }
 
 func ShowVendorHandler(w http.ResponseWriter, r *http.Request) {
