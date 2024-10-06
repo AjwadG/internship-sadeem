@@ -95,7 +95,14 @@ func main() {
 			vendors.HandleFunc("GET vendors/{id}/admins", controllers.VendorAdminsIndexHandler)
 		})
 
-
+		sub.Group(func(items *michi.Router) {
+			items.Use(utils.ValdiateToken)
+			items.HandleFunc("GET items", controllers.IndexItemHandler)
+			items.HandleFunc("POST items", controllers.CreateItemHandler)
+			items.HandleFunc("GET items/{id}", controllers.ShowItemHandler)
+			items.HandleFunc("PUT items/{id}", controllers.UpdateItemHandler)
+			items.HandleFunc("DELETE items/{id}", controllers.DeleteItemHandler)
+		})
 
 	})
 	fmt.Println("Starting server on port 8000")
