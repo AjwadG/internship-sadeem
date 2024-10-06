@@ -29,7 +29,6 @@ func main() {
 	}
 	defer db.Close()
 
-	fmt.Println("file://" + GetRootpath("database/migrations"))
 	mig, err := migrate.New(
 		"file://"+GetRootpath("database/migrations"),
 		os.Getenv("DATABASE_URL"),
@@ -64,12 +63,20 @@ func main() {
 			users.HandleFunc("POST users/revoke-role", controllers.RevokeRoleHandler)
 		})
 
+		// me routes
+		sub.Group(func(me *michi.Router) {
+			me.Use(utils.ValdiateToken)
+			me.HandleFunc("GET me", controllers.MeHandler)
+			me.HandleFunc("PUT me", controllers.UpdateMeHandler)
+		})
+
 		// Roles routes
 		sub.Group(func(roles *michi.Router) {
 			roles.HandleFunc("GET roles", controllers.IndexRoleHandler)
 			roles.HandleFunc("GET roles/{id}", controllers.ShowRoleHandler)
 		})
 
+		// auth routes
 		sub.Group(func(auth *michi.Router) {
 			auth.HandleFunc("POST signup", controllers.SignUpHandler)
 			auth.HandleFunc("POST login", controllers.LoginHandler)
@@ -77,15 +84,18 @@ func main() {
 
 		// vendors routes
 		sub.Group(func(vendors *michi.Router) {
-			vendors.HandleFunc("GET vendors", utils.ValdiateToken(controllers.IndexVendorHandler))
-			vendors.HandleFunc("POST vendors", utils.ValdiateToken(controllers.CreateVendorHandler))
-			vendors.HandleFunc("GET vendors/{id}", utils.ValdiateToken(controllers.ShowVendorHandler))
-			vendors.HandleFunc("PUT vendors/{id}", utils.ValdiateToken(controllers.UpdateVendorHandler))
-			vendors.HandleFunc("DELETE vendors/{id}", utils.ValdiateToken(controllers.DeleteVendorHandler))
-			// vendors.HandleFunc("POST vendors/assign-admin", controllers.GrantAdminHandler)
-			// vendors.HandleFunc("POST vendors/revoke-admin", controllers.RevokeAdminHandler)
-			// vendors.HandleFunc("GET vendors/{id}/admins", controllers.VendorAdminsIndexHandler)
+			vendors.Use(utils.ValdiateToken)
+			vendors.HandleFunc("GET vendors", controllers.IndexVendorHandler)
+			vendors.HandleFunc("POST vendors", controllers.CreateVendorHandler)
+			vendors.HandleFunc("GET vendors/{id}", controllers.ShowVendorHandler)
+			vendors.HandleFunc("PUT vendors/{id}", controllers.UpdateVendorHandler)
+			vendors.HandleFunc("DELETE vendors/{id}", controllers.DeleteVendorHandler)
+			vendors.HandleFunc("POST vendors/assign-admin", controllers.GrantAdminHandler)
+			vendors.HandleFunc("POST vendors/revoke-admin", controllers.RevokeAdminHandler)
+			vendors.HandleFunc("GET vendors/{id}/admins", controllers.VendorAdminsIndexHandler)
 		})
+
+
 
 	})
 	fmt.Println("Starting server on port 8000")

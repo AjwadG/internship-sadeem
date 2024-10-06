@@ -6,70 +6,17 @@ import (
 	"internship-project/utils"
 	"log"
 	"net/http"
-	"os"
 	"strings"
 	"time"
 
 	"github.com/Masterminds/squirrel"
-	"github.com/jmoiron/sqlx"
-	_ "github.com/joho/godotenv/autoload"
 )
 
-var (
-	db *sqlx.DB
-	QB = squirrel.StatementBuilder.PlaceholderFormat(squirrel.Dollar)
-)
-
-func SetDB(database *sqlx.DB) {
-	db = database
-	models.SetDB(db)
-}
-
-var (
-	Domain = os.Getenv("DOMAIN")
-
-	user_columns = []string{
-		"id",
-		"name",
-		"email",
-		"phone",
-		"created_at",
-		"updated_at",
-		fmt.Sprintf("CASE WHEN NULLIF(img, '') IS NOT NULL THEN FORMAT('%s/%%s', img) ELSE NULL END AS img", Domain),
-	}
-)
-
-func IndexUserHandler(w http.ResponseWriter, r *http.Request) {
-	var users []models.User
-
-	meta, err := utils.QueryBuilder(&users, "users", r.URL.Query(), user_columns, []string{"name", "email"})
-	if err != nil {
-		utils.HandleError(w, http.StatusInternalServerError, err.Error())
-		return
-	}
-
-	if users == nil {
-		users = []models.User{}
-	}
-	for i := range users {
-		if err := users[i].GetRoles(); err != nil {
-			log.Println(err)
-		}
-	}
-
-	utils.SendJSONResponse(w, http.StatusOK, models.Response{
-		Meta: meta,
-		Data: users,
-	})
-}
-
-func ShowUserHandler(w http.ResponseWriter, r *http.Request) {
+func MeHandler(w http.ResponseWriter, r *http.Request) {
+	userID := r.Context().Value(utils.UserIDKey).(string)
 	var user models.User
-	id := r.PathValue("id")
-	query, args, err := QB.Select(strings.Join(user_columns, ", ")).
-		From("users").
-		Where("id = ?", id).
-		ToSql()
+
+	query, args, err := QB.Select(strings.Join(user_columns, ", ")).From("users").Where("id = ?", userID).ToSql()
 	if err != nil {
 		utils.HandleError(w, http.StatusInternalServerError, err.Error())
 		return
@@ -78,16 +25,18 @@ func ShowUserHandler(w http.ResponseWriter, r *http.Request) {
 		utils.HandleError(w, http.StatusInternalServerError, err.Error())
 		return
 	}
+
 	if err := user.GetRoles(); err != nil {
 		utils.HandleError(w, http.StatusInternalServerError, err.Error())
 		return
 	}
+
 	utils.SendJSONResponse(w, http.StatusOK, user)
 }
 
-func UpdateUserHandler(w http.ResponseWriter, r *http.Request) {
+func UpdateMeHandler(w http.ResponseWriter, r *http.Request) {
+	id := r.Context().Value(utils.UserIDKey).(string)
 	var user models.User
-	id := r.PathValue("id")
 	query, args, err := QB.Select(user_columns...).
 		From("users").
 		Where("id = ?", id).
@@ -172,31 +121,4 @@ func UpdateUserHandler(w http.ResponseWriter, r *http.Request) {
 	}
 
 	utils.SendJSONResponse(w, http.StatusOK, user)
-}
-
-func DeleteUserHandler(w http.ResponseWriter, r *http.Request) {
-	id := r.PathValue("id")
-	// Use QB to build the delete query
-	query, args, err := QB.Delete("users").
-		Where("id = ?", id).
-		Suffix("RETURNING img").
-		ToSql()
-	if err != nil {
-		utils.HandleError(w, http.StatusInternalServerError, "Error building query: "+err.Error())
-		return
-	}
-
-	var img *string
-	if err := db.QueryRow(query, args...).Scan(&img); err != nil {
-		utils.HandleError(w, http.StatusInternalServerError, "Error deleting user: "+err.Error())
-		return
-	}
-	// If the user has an image, delete it
-	if img != nil {
-		if err := utils.DeleteImageFile(*img); err != nil {
-			log.Println(err)
-		}
-	}
-
-	w.WriteHeader(http.StatusNoContent)
 }

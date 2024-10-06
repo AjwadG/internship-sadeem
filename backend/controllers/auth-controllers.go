@@ -58,8 +58,19 @@ func SignUpHandler(w http.ResponseWriter, r *http.Request) {
 		utils.HandleError(w, http.StatusInternalServerError, "Error creating user"+err.Error())
 		return
 	}
-	utils.SendJSONResponse(w, http.StatusCreated, user)
 
+	query, args, err = QB.Insert("user_roles").Columns("user_id", "role_id").Values(user.ID, 3).ToSql()
+	if err != nil {
+		utils.HandleError(w, http.StatusInternalServerError, "Error generate query")
+		return
+	}
+
+	if _, err := db.Exec(query, args...); err != nil {
+		utils.HandleError(w, http.StatusInternalServerError, "Error granting role"+err.Error())
+		return
+	}
+
+	utils.SendJSONResponse(w, http.StatusCreated, user)
 }
 
 func LoginHandler(w http.ResponseWriter, r *http.Request) {

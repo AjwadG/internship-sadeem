@@ -116,8 +116,8 @@ type contextKey string
 
 const UserIDKey = contextKey("userID")
 
-func ValdiateToken(next http.HandlerFunc) http.HandlerFunc {
-	return func(w http.ResponseWriter, r *http.Request) {
+func ValdiateToken(next http.Handler) http.Handler {
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		tokenString := r.Header.Get("Authorization")
 		if tokenString == "" {
 			HandleError(w, http.StatusUnauthorized, "Missing Authorization header")
@@ -146,7 +146,6 @@ func ValdiateToken(next http.HandlerFunc) http.HandlerFunc {
 		// Extract userID from token claims
 		if claims, ok := token.Claims.(jwt.MapClaims); ok && token.Valid {
 			userID := claims["userID"].(string)
-			// Add userID to the context
 			ctx := context.WithValue(r.Context(), UserIDKey, userID)
 			r = r.WithContext(ctx)
 		} else {
@@ -154,8 +153,8 @@ func ValdiateToken(next http.HandlerFunc) http.HandlerFunc {
 			return
 		}
 
-		next(w, r)
-	}
+		next.ServeHTTP(w, r)
+	})
 }
 
 func CORS(next http.Handler) http.Handler {

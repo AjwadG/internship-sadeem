@@ -202,3 +202,82 @@ func CreateVendorHandler(w http.ResponseWriter, r *http.Request) {
 	utils.SendJSONResponse(w, http.StatusCreated, vendor)
 
 }
+
+func GrantAdminHandler(w http.ResponseWriter, r *http.Request) {
+	user_id := r.FormValue("user_id")
+	vendor_id := r.FormValue("vendor_id")
+
+	if user_id == "" || vendor_id == "" {
+		utils.HandleError(w, http.StatusBadRequest, "Missing required parameters")
+	}
+
+	query, args, err := QB.Insert("vendor_admins").Columns("user_id", "vendor_id").Values(user_id, vendor_id).ToSql()
+
+	if err != nil {
+		utils.HandleError(w, http.StatusInternalServerError, err.Error())
+		return
+	}
+
+	if _, err := db.Exec(query, args...); err != nil {
+		utils.HandleError(w, http.StatusInternalServerError, err.Error())
+		return
+	}
+
+	utils.SendJSONResponse(w, http.StatusOK, "admin granted successfully")
+}
+
+func RevokeAdminHandler(w http.ResponseWriter, r *http.Request) {
+	user_id := r.FormValue("user_id")
+	vendor_id := r.FormValue("vendor_id")
+
+	if user_id == "" || vendor_id == "" {
+		utils.HandleError(w, http.StatusBadRequest, "Missing required parameters")
+	}
+
+	query, args, err := QB.Delete("vendor_admins").Where("user_id = ? AND vendor_id = ?", user_id, vendor_id).ToSql()
+
+	if err != nil {
+		utils.HandleError(w, http.StatusInternalServerError, err.Error())
+		return
+	}
+
+	if _, err := db.Exec(query, args...); err != nil {
+		utils.HandleError(w, http.StatusInternalServerError, err.Error())
+		return
+	}
+
+	utils.SendJSONResponse(w, http.StatusOK, "admin removed successfully")
+}
+
+func VendorAdminsIndexHandler(w http.ResponseWriter, r *http.Request) {
+	vendor_id := r.PathValue("id")
+
+	query, args, err := QB.Select("users.*").
+		From("users").
+		Join("vendor_admins ON vendor_admins.user_id = users.id").
+		Where("vendor_admins.vendor_id = ?", vendor_id).
+		ToSql()
+
+	if err != nil {
+		utils.HandleError(w, http.StatusInternalServerError, err.Error())
+		return
+	}
+
+	var users []models.User
+	if err := db.Select(&users, query, args...); err != nil {
+		utils.HandleError(w, http.StatusInternalServerError, err.Error())
+		return
+	}
+
+	for i := range users {
+		if err := users[i].GetRoles(); err != nil {
+			log.Println(err)
+		}
+	}
+
+	if users == nil {
+		users = []models.User{}
+	}
+
+	utils.SendJSONResponse(w, http.StatusOK, users)
+}
