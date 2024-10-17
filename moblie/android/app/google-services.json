@@ -1,0 +1,98 @@
+{
+  "project_info": {
+    "project_number": "565900859786",
+    "project_id": "arrivo-app",
+    "storage_bucket": "arrivo-app.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:565900859786:android:a28b1451ce23a2e5c65073",
+        "android_client_info": {
+          "package_name": "com.sadeemtech.internship"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "565900859786-3ipkos9euglf5fofvu21n1agidnd8gfo.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.sadeemtech.internship",
+            "certificate_hash": "0a8c17f112aef8ff5c58f8a77c8504070e4cd8b3"
+          }
+        },
+        {
+          "client_id": "565900859786-794rn8t6qii6tr2fn8lf6vi870ui79vc.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyC2982dmgI3EsN2tdpJSptqa920RkQLB0Y"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "565900859786-794rn8t6qii6tr2fn8lf6vi870ui79vc.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "565900859786-b4ld899888hf95t32qqu0a54061obc9p.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "SadeemTech.slate.fleming"
+              }
+            }
+          ]
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:565900859786:android:14d37eaea2a36850c65073",
+        "android_client_info": {
+          "package_name": "com.sadeemtech.internship_driver"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "565900859786-9csakhj203upu45l1o4j6r44mef4umfr.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.sadeemtech.internship_driver",
+            "certificate_hash": "0a8c17f112aef8ff5c58f8a77c8504070e4cd8b3"
+          }
+        },
+        {
+          "client_id": "565900859786-794rn8t6qii6tr2fn8lf6vi870ui79vc.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyC2982dmgI3EsN2tdpJSptqa920RkQLB0Y"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "565900859786-794rn8t6qii6tr2fn8lf6vi870ui79vc.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "565900859786-b4ld899888hf95t32qqu0a54061obc9p.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "SadeemTech.slate.fleming"
+              }
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
