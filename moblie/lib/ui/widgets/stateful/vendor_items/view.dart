@@ -103,6 +103,15 @@ class _VendorItemsViewState extends State<VendorItemsView> {
                   child: const Text('الاضافة الي اسلة'),
                 ),
                 UIHelper.verticalSpaceMedium(),
+                ElevatedButton(
+                  onPressed: () async {
+                    await viewModel.request_service();
+                  },
+                  style: ElevatedButton.styleFrom(
+                    minimumSize: const Size.fromHeight(50), // Full-width button
+                  ),
+                  child: const Text(' طلب الخدمة '),
+                ),
               ],
             ),
           ),

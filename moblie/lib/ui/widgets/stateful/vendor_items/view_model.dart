@@ -20,7 +20,7 @@ class VendorItemsViewModel extends BaseViewModel {
     _items = (await locator<MagicalRepository>().handelRequest(
             model: Item(),
             specific_key: EndPointParameter.DATA,
-            parameters: {"": ""},
+            parameters: {"filters": "vendor_id:${vendor_id}"},
             methodType: HTTPMethodType.GET,
             route: ApiRoutes.items))
         .cast<Item>();

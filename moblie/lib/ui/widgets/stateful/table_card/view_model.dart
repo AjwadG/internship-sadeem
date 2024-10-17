@@ -23,7 +23,7 @@ class TableCardViewModel extends BaseViewModel {
       shape: const RoundedRectangleBorder(
         borderRadius: BorderRadius.vertical(top: Radius.circular(16)),
       ),
-      builder: (context) => VendorItemsView(vendor_id: "1"),
+      builder: (context) => VendorItemsView(vendor_id: table!.vendor_id!),
     );
   }
 }
