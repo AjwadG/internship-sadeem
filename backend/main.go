@@ -104,6 +104,30 @@ func main() {
 			items.HandleFunc("DELETE items/{id}", controllers.DeleteItemHandler)
 		})
 
+		sub.Group(func(cart *michi.Router) {
+			cart.Use(utils.ValdiateToken)
+			cart.HandleFunc("GET cart", controllers.IndexCartHandler)
+			cart.HandleFunc("POST cart/add", controllers.AddCartHandler)
+			cart.HandleFunc("POST cart/empty", controllers.EmptyCartHandler)
+			cart.HandleFunc("POST cart/checkout", controllers.CheckoutCartHandler)
+		})
+
+		sub.Group(func(order *michi.Router) {
+			order.Use(utils.ValdiateToken)
+			order.HandleFunc("GET orders", controllers.IndexOrdersHandler)
+			order.HandleFunc("GET orders/{id}", controllers.ShowOrdersHandler)
+			order.HandleFunc("PUT orders/{id}", controllers.UpdateOrdersHandler)
+		})
+
+		sub.Group(func(table *michi.Router) {
+			table.Use(utils.ValdiateToken)
+			table.HandleFunc("GET tables", controllers.IndexTableHandler)
+			table.HandleFunc("GET tables/{id}", controllers.ShowTableHandler)
+			table.HandleFunc("POST tables", controllers.AddTableHandler)
+			table.HandleFunc("PUT tables/{id}", controllers.UpdateTableHandler)
+			table.HandleFunc("DELETE tables/{id}", controllers.DeleteTableHandler)
+		})
+
 	})
 	fmt.Println("Starting server on port 8000")
 	http.ListenAndServe(":8000", r)

@@ -194,7 +194,7 @@ func UpdateItemHandler(w http.ResponseWriter, r *http.Request) {
 
 	var oldImg *string
 	var newImg *string
-	// Handle image file upload
+
 	file, fileHeader, err := r.FormFile("img")
 	if err != nil && err != http.ErrMissingFile {
 		utils.HandleError(w, http.StatusBadRequest, "Error retrieving file: "+err.Error())

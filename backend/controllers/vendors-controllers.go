@@ -76,7 +76,7 @@ func UpdateVendorHandler(w http.ResponseWriter, r *http.Request) {
 		utils.HandleError(w, http.StatusInternalServerError, err.Error())
 		return
 	}
-	// update vendor
+
 	if r.FormValue("name") != "" {
 		vendor.Name = r.FormValue("name")
 	}
@@ -85,7 +85,7 @@ func UpdateVendorHandler(w http.ResponseWriter, r *http.Request) {
 	}
 	var oldImg *string
 	var newImg *string
-	// Handle image file upload
+
 	file, fileHeader, err := r.FormFile("img")
 	if err != nil && err != http.ErrMissingFile {
 		utils.HandleError(w, http.StatusBadRequest, "Error retrieving file: "+err.Error())
@@ -139,7 +139,7 @@ func UpdateVendorHandler(w http.ResponseWriter, r *http.Request) {
 
 func DeleteVendorHandler(w http.ResponseWriter, r *http.Request) {
 	id := r.PathValue("id")
-	// Use QB to build the delete query
+
 	query, args, err := QB.Delete("vendors").
 		Where("id = ?", id).
 		Suffix("RETURNING img").
@@ -154,7 +154,7 @@ func DeleteVendorHandler(w http.ResponseWriter, r *http.Request) {
 		utils.HandleError(w, http.StatusInternalServerError, "Error deleting vendor: "+err.Error())
 		return
 	}
-	// If the vendor has an image, delete it
+
 	if img != nil {
 		if err := utils.DeleteImageFile(*img); err != nil {
 			log.Println(err)

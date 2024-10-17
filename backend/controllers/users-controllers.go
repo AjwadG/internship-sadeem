@@ -100,7 +100,7 @@ func UpdateUserHandler(w http.ResponseWriter, r *http.Request) {
 		utils.HandleError(w, http.StatusInternalServerError, err.Error())
 		return
 	}
-	// update user
+
 	if r.FormValue("name") != "" {
 		user.Name = r.FormValue("name")
 	}
@@ -120,7 +120,7 @@ func UpdateUserHandler(w http.ResponseWriter, r *http.Request) {
 	}
 	var oldImg *string
 	var newImg *string
-	// Handle image file upload
+
 	file, fileHeader, err := r.FormFile("img")
 	if err != nil && err != http.ErrMissingFile {
 		utils.HandleError(w, http.StatusBadRequest, "Error retrieving file: "+err.Error())
@@ -176,7 +176,7 @@ func UpdateUserHandler(w http.ResponseWriter, r *http.Request) {
 
 func DeleteUserHandler(w http.ResponseWriter, r *http.Request) {
 	id := r.PathValue("id")
-	// Use QB to build the delete query
+
 	query, args, err := QB.Delete("users").
 		Where("id = ?", id).
 		Suffix("RETURNING img").
@@ -191,7 +191,7 @@ func DeleteUserHandler(w http.ResponseWriter, r *http.Request) {
 		utils.HandleError(w, http.StatusInternalServerError, "Error deleting user: "+err.Error())
 		return
 	}
-	// If the user has an image, delete it
+
 	if img != nil {
 		if err := utils.DeleteImageFile(*img); err != nil {
 			log.Println(err)

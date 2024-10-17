@@ -85,3 +85,47 @@ type Item struct {
 	Created_at time.Time `db:"created_at"  json:"created_at"`
 	Updated_at time.Time `db:"updated_at"  json:"updated_at"`
 }
+
+type Cart struct {
+	ID         uuid.UUID   `db:"id"          json:"id"`
+	TotalPrice float64     `db:"total_price" json:"total_price"`
+	Quantity   int         `db:"quantity"    json:"quantity"`
+	Vendor_id  uuid.UUID   `db:"vendor_id"   json:"vendor_id"`
+	Created_at time.Time   `db:"created_at"  json:"created_at"`
+	Updated_at time.Time   `db:"updated_at"  json:"updated_at"`
+	Cart_item  []Cart_item `db:"-" json:"cart_item"`
+}
+
+type Cart_item struct {
+	Cart_id  uuid.UUID `db:"cart_id"     json:"cart_id"`
+	Quantity int       `db:"quantity"    json:"quantity"`
+	Item_id  uuid.UUID `db:"item_id"     json:"item_id"`
+}
+
+type Order struct {
+	ID               uuid.UUID     `db:"id"          json:"id"`
+	Total_order_cost float64       `db:"total_order_cost" json:"total_order_cost"`
+	Vendor_id        uuid.UUID     `db:"vendor_id"   json:"vendor_id"`
+	Customer_id      uuid.UUID     `db:"customer_id"   json:"customer_id"`
+	Status           string        `db:"status"        json:"status"`
+	Created_at       time.Time     `db:"created_at"  json:"created_at"`
+	Updated_at       time.Time     `db:"updated_at"  json:"updated_at"`
+	Order_items      []Order_items `db:"-" json:"order_items"`
+}
+
+type Order_items struct {
+	ID       uuid.UUID `db:"id"          json:"id"`
+	Order_id uuid.UUID `db:"order_id"     json:"order_id"`
+	Quantity int       `db:"quantity"    json:"quantity"`
+	Price    float64   `db:"price"       json:"price"`
+	Item_id  uuid.UUID `db:"item_id"     json:"item_id"`
+}
+
+type Table struct {
+	ID               uuid.UUID `db:"id"          json:"id"`
+	Name             string    `db:"name"        json:"name"`
+	Vendor_id        uuid.UUID `db:"vendor_id"   json:"vendor_id"`
+	Customer_id      uuid.UUID `db:"customer_id"   json:"customer_id"`
+	Is_available     bool      `db:"is_available"        json:"is_available"`
+	Is_needs_service bool      `db:"is_needs_service" json:"is_needs_service"`
+}

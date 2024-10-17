@@ -3,6 +3,7 @@ package utils
 import (
 	"context"
 	"encoding/json"
+	"errors"
 	"fmt"
 	"internship-project/models"
 	"io"
@@ -255,4 +256,15 @@ func QueryBuilder(reciver interface{}, table string, queryParams url.Values, col
 	}
 
 	return meta, nil
+}
+
+func ParseBool(str string) (bool, error) {
+	switch strings.ToLower(strings.TrimSpace(str)) {
+	case "1", "t", "true":
+		return true, nil
+	case "0", "f", "false":
+		return false, nil
+	default:
+		return false, errors.New("invalid boolean value")
+	}
 }

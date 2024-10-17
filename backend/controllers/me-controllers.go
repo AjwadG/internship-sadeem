@@ -49,7 +49,7 @@ func UpdateMeHandler(w http.ResponseWriter, r *http.Request) {
 		utils.HandleError(w, http.StatusInternalServerError, err.Error())
 		return
 	}
-	// update user
+
 	if r.FormValue("name") != "" {
 		user.Name = r.FormValue("name")
 	}
@@ -69,7 +69,7 @@ func UpdateMeHandler(w http.ResponseWriter, r *http.Request) {
 	}
 	var oldImg *string
 	var newImg *string
-	// Handle image file upload
+
 	file, fileHeader, err := r.FormFile("img")
 	if err != nil && err != http.ErrMissingFile {
 		utils.HandleError(w, http.StatusBadRequest, "Error retrieving file: "+err.Error())
