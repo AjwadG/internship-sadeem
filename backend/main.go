@@ -47,6 +47,7 @@ func main() {
 	utils.SetDB(db)
 
 	r := michi.NewRouter()
+	
 
 	r.Use(utils.CORS)
 	r.Route("/", func(sub *michi.Router) {
@@ -82,10 +83,10 @@ func main() {
 			auth.HandleFunc("POST login", controllers.LoginHandler)
 		})
 
+		sub.HandleFunc("GET vendors", controllers.IndexVendorHandler)
 		// vendors routes
 		sub.Group(func(vendors *michi.Router) {
 			vendors.Use(utils.ValdiateToken)
-			vendors.HandleFunc("GET vendors", controllers.IndexVendorHandler)
 			vendors.HandleFunc("POST vendors", controllers.CreateVendorHandler)
 			vendors.HandleFunc("GET vendors/{id}", controllers.ShowVendorHandler)
 			vendors.HandleFunc("PUT vendors/{id}", controllers.UpdateVendorHandler)

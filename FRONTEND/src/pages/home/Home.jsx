@@ -82,7 +82,7 @@ const Home = () => {
     })
       .then((res) => res.json())
       .then((data) => {
-        setVendors(data ? data : []);
+        setVendors(data ? data.data : []);
         pagination.pages = Math.ceil(
           data ? data.length : 0 / pagination.pageSize
         );
